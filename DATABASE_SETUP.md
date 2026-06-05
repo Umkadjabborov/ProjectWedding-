@@ -6,7 +6,7 @@
 
 **Database Type:** PostgreSQL (Neon Cloud)  
 **ORM:** Prisma  
-**Connection:** `postgresql://neondb_owner:npg_3hXFiAZfIr1B@ep-nameless-credit-apfxzwvz-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+**Connection:** `postgresql://neondb_owner:npg_3hXFiAZfIr1B@ep-nameless-credit-apfxzwvz-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require&connection_limit=2&pgbouncer=true`
 
 ---
 

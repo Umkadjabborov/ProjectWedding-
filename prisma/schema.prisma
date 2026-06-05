@@ -13,9 +13,8 @@ generator client {
 
 // PostgreSQL ulanish sozlamalari — .env faylidan DATABASE_URL o'qiladi
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL="postgresql://neondb_owner:npg_3hXFiAZfIr1B@ep-nameless-credit-apfxzwvz-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require&connection_limit=2&pgbouncer=true"")
 }
 
 // ---------------------------------------------------------------

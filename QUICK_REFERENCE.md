@@ -2,7 +2,7 @@
 
 ## Database Status
 ✅ **Connected:** PostgreSQL (Neon Cloud)  
-✅ **URL:** `postgresql://neondb_owner:npg_3hXFiAZfIr1B@ep-nameless-credit-apfxzwvz-pooler.c-7.us-east-1.aws.neon.tech/neondb`
+✅ **URL:** `postgresql://neondb_owner:npg_3hXFiAZfIr1B@ep-nameless-credit-apfxzwvz-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require&connection_limit=2&pgbouncer=true`
 
 ---
 
