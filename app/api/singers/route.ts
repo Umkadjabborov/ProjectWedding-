@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ok, serverError } from "@/lib/api-response";
+import { normalizePrismaValue } from "@/lib/prisma-transform";
 
 export async function GET() {
   try {
@@ -7,7 +8,7 @@ export async function GET() {
       include: { hall: { select: { id: true, name: true } } },
       orderBy: { name: "asc" },
     });
-    return ok(singers);
+    return ok(normalizePrismaValue(singers));
   } catch (e) {
     console.error("[GET_SINGERS]", e);
     return serverError();

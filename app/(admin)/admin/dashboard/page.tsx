@@ -45,7 +45,7 @@ export default async function AdminDashboard() {
     },
     {
       title: "Jami daromad",
-      value: formatPrice(revenue._sum.advancePayment ?? 0),
+      value: formatPrice(Number(revenue._sum.advancePayment ?? 0)),
       icon: "TrendingUp",
       color: "green" as const,
       index: 3,

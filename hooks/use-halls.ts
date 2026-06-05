@@ -26,7 +26,12 @@ async function fetchHalls(filters: HallFilters = {}): Promise<HallType[]> {
   const res = await fetch(`/api/halls?${params}`);
   const json: ApiResponse<HallType[]> = await res.json();
   if (!json.success) throw new Error(json.error);
-  return json.data!;
+  // Convert nullable DB values (null) to undefined for optional numeric fields
+  return json.data!.map((h) => ({
+    ...h,
+    latitude: h.latitude ?? undefined,
+    longitude: h.longitude ?? undefined,
+  }));
 }
 
 // Bitta zalning to'liq ma'lumotini olish (singers, cars, bookings bilan)
@@ -34,7 +39,13 @@ async function fetchHall(id: string): Promise<HallType> {
   const res = await fetch(`/api/halls/${id}`);
   const json: ApiResponse<HallType> = await res.json();
   if (!json.success) throw new Error(json.error);
-  return json.data!;
+  // Normalize nullable numeric fields coming from DB
+  const h = json.data!;
+  return {
+    ...h,
+    latitude: h.latitude ?? undefined,
+    longitude: h.longitude ?? undefined,
+  };
 }
 
 // Filtrlangan zallar ro'yxati — queryKey da filters bo'lgani uchun
@@ -94,7 +105,13 @@ export function useCreateHall() {
       });
       const json: ApiResponse<HallType> = await res.json();
       if (!json.success) throw new Error(json.error);
-      return json.data!;
+      // Normalize nullable numeric fields
+      const h = json.data!;
+      return {
+        ...h,
+        latitude: h.latitude ?? undefined,
+        longitude: h.longitude ?? undefined,
+      };
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["halls"] }),
   });
@@ -133,7 +150,12 @@ export function useUpdateHall(id: string) {
       });
       const json: ApiResponse<HallType> = await res.json();
       if (!json.success) throw new Error(json.error);
-      return json.data!;
+      const h = json.data!;
+      return {
+        ...h,
+        latitude: h.latitude ?? undefined,
+        longitude: h.longitude ?? undefined,
+      };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["halls"] });

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return notFound("Foydalanuvchi");
 
-    const otp = await prisma.oTP.findFirst({
+    const otp = await prisma.otpCode.findFirst({
       where: {
         userId: user.id,
         code,
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     if (!otp) return err("Noto'g'ri yoki muddati o'tgan kod", 400);
 
-    await prisma.oTP.update({ where: { id: otp.id }, data: { used: true } });
+    await prisma.otpCode.update({ where: { id: otp.id }, data: { used: true } });
     await prisma.user.update({ where: { id: user.id }, data: { isVerified: true } });
 
     return ok({ verified: true });

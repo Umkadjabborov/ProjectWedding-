@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return notFound("Foydalanuvchi");
 
-    await prisma.oTP.updateMany({
+    await prisma.otpCode.updateMany({
       where: { userId: user.id, used: false },
       data: { used: true },
     });
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const code = generateOTP();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
-    await prisma.oTP.create({
+    await prisma.otpCode.create({
       data: { userId: user.id, code, expiresAt },
     });
 

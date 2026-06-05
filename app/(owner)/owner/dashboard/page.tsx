@@ -30,7 +30,7 @@ export default async function OwnerDashboard() {
         <StatsCard title="Zallarim" value={halls} icon="Building2" />
         <StatsCard title="Jami bronlar" value={bookings} icon="CalendarCheck" />
         <StatsCard title="Kutilayotgan" value={upcoming} icon="Users" />
-        <StatsCard title="Daromad" value={formatPrice(revenue._sum.advancePayment ?? 0)} icon="TrendingUp" />
+        <StatsCard title="Daromad" value={formatPrice(Number(revenue._sum.advancePayment ?? 0))} icon="TrendingUp" />
       </div>
     </div>
   );

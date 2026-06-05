@@ -1,7 +1,9 @@
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { ok, err, unauthorized, serverError } from "@/lib/api-response";
 import { bookingSchema } from "@/lib/validations";
+import { normalizeBooking } from "@/lib/prisma-transform";
 
 export async function GET(req: Request) {
   try {
@@ -29,13 +31,14 @@ export async function GET(req: Request) {
     const bookings = await prisma.booking.findMany({
       where,
       include: {
-        hall: { select: { id: true, name: true, district: true, images: true } },
+        hall: { select: { id: true, name: true, district: true, hallImages: { select: { url: true } } } },
         user: { select: { id: true, firstName: true, lastName: true, phone: true, email: true } },
+        bookingServices: true,
       },
-      orderBy: { date: sortOrder },
+      orderBy: { bookingDate: sortOrder },
     });
 
-    return ok(bookings);
+    return ok(bookings.map(normalizeBooking));
   } catch (e) {
     console.error("[GET_BOOKINGS]", e);
     return serverError();
@@ -66,32 +69,42 @@ export async function POST(req: Request) {
 
     const bookingDate = new Date(date);
     const existing = await prisma.booking.findFirst({
-      where: { hallId, date: bookingDate, status: { not: "CANCELLED" } },
+      where: { hallId, bookingDate, status: { not: "CANCELLED" } },
     });
     if (existing) return err("Bu sana band", 400);
 
     const servicesTotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
-    const totalPrice = guestCount * hall.pricePerSeat + servicesTotal;
-    const advancePayment = totalPrice * 0.2;
+    const totalPrice = BigInt(guestCount * Number(hall.pricePerSeat) + servicesTotal);
+    const advancePayment = totalPrice / BigInt(5);
 
     const booking = await prisma.booking.create({
       data: {
+        id: randomUUID(),
         hallId,
         userId: session.user.id,
-        date: bookingDate,
+        bookingDate,
         guestCount,
         totalPrice,
         advancePayment,
-        selectedServices,
         status: "UPCOMING",
+        bookingServices: selectedServices.length
+          ? {
+              create: selectedServices.map((service) => ({
+                serviceType: service.type as "SINGER" | "CAR" | "KARNAY",
+                serviceName: service.name,
+                price: BigInt(service.price),
+              })),
+            }
+          : undefined,
       },
       include: {
-        hall: { select: { id: true, name: true, district: true } },
+        hall: { select: { id: true, name: true, district: true, hallImages: { select: { url: true } } } },
         user: { select: { id: true, firstName: true, lastName: true } },
+        bookingServices: true,
       },
     });
 
-    return ok(booking, 201);
+    return ok(normalizeBooking(booking), 201);
   } catch (e) {
     console.error("[CREATE_BOOKING]", e);
     return serverError();

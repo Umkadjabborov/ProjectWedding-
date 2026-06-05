@@ -1,8 +1,10 @@
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { ok, err, unauthorized, serverError } from "@/lib/api-response";
 import { hallSchema } from "@/lib/validations";
 import type { HallFilters } from "@/types";
+import { normalizeHall } from "@/lib/prisma-transform";
 
 export async function GET(req: Request) {
   try {
@@ -34,12 +36,12 @@ export async function GET(req: Request) {
       where,
       include: {
         owner: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
-        _count: { select: { bookings: true } },
+        hallImages: true,
       },
       orderBy: { [sortBy]: sortOrder },
     });
 
-    return ok(halls);
+    return ok(halls.map(normalizeHall));
   } catch (e) {
     console.error("[GET_HALLS]", e);
     return serverError();
@@ -54,25 +56,33 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { singers, cars, menuItems, karnayPrice, ...hallData } = body;
+    const { singers, cars, menuItems, karnayPrice, images, ...hallData } = body;
     const validated = hallSchema.parse(hallData);
 
     const hall = await prisma.hall.create({
       data: {
+        id: randomUUID(),
         ...validated,
         ownerId: session.user.role === "OWNER" ? session.user.id : (body.ownerId || session.user.id),
         status: session.user.role === "OWNER" ? "PENDING" : "APPROVED",
+        karnayEnabled: Boolean(karnayPrice),
+        karnayPrice: karnayPrice ?? undefined,
+        hallImages: images?.length
+          ? {
+              create: images.map((url: string, index: number) => ({
+                url,
+                sortOrder: index,
+              })),
+            }
+          : undefined,
         singers: singers?.length ? { create: singers } : undefined,
         cars: cars?.length ? { create: cars } : undefined,
         menuItems: menuItems?.length ? { create: menuItems } : undefined,
-        services: karnayPrice
-          ? { create: [{ name: "Karnay-Surnay", price: karnayPrice, type: "KARNAY" }] }
-          : undefined,
       },
-      include: { singers: true, cars: true, menuItems: true, services: true },
+      include: { singers: true, cars: true, menuItems: true, hallImages: true },
     });
 
-    return ok(hall, 201);
+    return ok(normalizeHall(hall), 201);
   } catch (e) {
     console.error("[CREATE_HALL]", e);
     return serverError();

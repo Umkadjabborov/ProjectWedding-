@@ -9,11 +9,11 @@ export async function GET(
     const { id } = await params;
     const bookings = await prisma.booking.findMany({
       where: { hallId: id, status: { not: "CANCELLED" } },
-      select: { date: true },
+      select: { bookingDate: true },
     });
 
     const dates = bookings.map((b) =>
-      new Date(b.date).toISOString().split("T")[0]
+      new Date(b.bookingDate).toISOString().split("T")[0]
     );
 
     return ok(dates);

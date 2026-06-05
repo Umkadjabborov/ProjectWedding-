@@ -6,10 +6,10 @@
 //         NextAuth Session turi ham shu yerda kengaytiriladi.
 // =============================================================
 
-import type { Role, HallStatus, BookingStatus, ServiceType } from "@prisma/client";
+import type { UserRole, HallStatus, BookingStatus, ServiceType } from "@prisma/client";
 
 // Prisma enumlarini re-export qilish — boshqa fayllar shu yerdan import qiladi
-export type { Role, HallStatus, BookingStatus, ServiceType };
+export type { UserRole, HallStatus, BookingStatus, ServiceType };
 
 // ---------------------------------------------------------------
 // Foydalanuvchi interfeysi
@@ -22,7 +22,7 @@ export interface UserType {
   email: string;
   username: string;
   phone?: string | null;
-  role: Role;
+  role: UserRole;
   isVerified: boolean;
   createdAt: Date;
 }

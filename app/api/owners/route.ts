@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { ok, unauthorized, err, serverError } from "@/lib/api-response";
@@ -48,11 +49,12 @@ export async function POST(req: Request) {
     const hashed = await bcrypt.hash(validated.password, 10);
     const owner = await prisma.user.create({
       data: {
+        id: randomUUID(),
         ...validated,
         password: hashed,
         role: "OWNER",
         isVerified: true,
-        phone: validated.phone || null,
+        phone: validated.phone ?? "",
       },
       select: {
         id: true, firstName: true, lastName: true,

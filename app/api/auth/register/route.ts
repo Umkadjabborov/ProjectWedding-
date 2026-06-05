@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { ok, err, serverError } from "@/lib/api-response";
 import { registerSchema } from "@/lib/validations";
@@ -16,11 +17,12 @@ export async function POST(req: Request) {
     const hashed = await bcrypt.hash(validated.password, 10);
     const user = await prisma.user.create({
       data: {
+        id: randomUUID(),
         ...validated,
         password: hashed,
         role: "USER",
         isVerified: true,
-        phone: validated.phone || null,
+        phone: validated.phone ?? "",
       },
       select: { id: true, firstName: true, lastName: true, email: true, role: true },
     });
