@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -27,7 +26,6 @@ async function main() {
     where: { email: "admin@toyxona.uz" },
     update: {},
     create: {
-      id: randomUUID(),
       firstName: "Super",
       lastName: "Admin",
       email: "admin@toyxona.uz",
@@ -45,7 +43,6 @@ async function main() {
     where: { email: "owner1@toyxona.uz" },
     update: {},
     create: {
-      id: randomUUID(),
       firstName: "Jasur",
       lastName: "Toshmatov",
       email: "owner1@toyxona.uz",
@@ -61,7 +58,6 @@ async function main() {
     where: { email: "owner2@toyxona.uz" },
     update: {},
     create: {
-      id: randomUUID(),
       firstName: "Dilnoza",
       lastName: "Yusupova",
       email: "owner2@toyxona.uz",
@@ -79,7 +75,6 @@ async function main() {
     where: { email: "user1@gmail.com" },
     update: {},
     create: {
-      id: randomUUID(),
       firstName: "Bobur",
       lastName: "Karimov",
       email: "user1@gmail.com",
@@ -98,12 +93,10 @@ async function main() {
     create: {
       id: "hall-seed-1",
       name: "Guliston To'yxonasi",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800",
+        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800",
+      ],
       district: "Yunusobod",
       address: "Yunusobod tumani, 14-mavze, 25-uy",
       capacity: 500,
@@ -120,12 +113,10 @@ async function main() {
     create: {
       id: "hall-seed-2",
       name: "Bahor Saroyi",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=800",
+        "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800",
+      ],
       district: "Chilonzor",
       address: "Chilonzor tumani, Bunyodkor ko'chasi, 10-uy",
       capacity: 300,
@@ -142,11 +133,9 @@ async function main() {
     create: {
       id: "hall-seed-3",
       name: "Sharq Nuri",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800", sortOrder: 0 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800",
+      ],
       district: "Mirzo Ulugbek",
       address: "Mirzo Ulugbek tumani, Universitet ko'chasi, 5-uy",
       capacity: 400,
@@ -163,11 +152,9 @@ async function main() {
     create: {
       id: "hall-seed-4",
       name: "Oltin Zal",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800", sortOrder: 0 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800",
+      ],
       district: "Yakkasaroy",
       address: "Yakkasaroy tumani, Amir Temur ko'chasi, 88-uy",
       capacity: 600,
@@ -184,11 +171,9 @@ async function main() {
     create: {
       id: "hall-seed-5",
       name: "Yangi Hayot To'yxonasi",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800", sortOrder: 0 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800",
+      ],
       district: "Sergeli",
       address: "Sergeli tumani, Yangi hayot ko'chasi, 3-uy",
       capacity: 250,
@@ -203,18 +188,16 @@ async function main() {
   await prisma.singer.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall1.id,
         name: "Sherzod Qodirov",
         price: 2000000,
-        imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
+        image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
       },
       {
-        id: randomUUID(),
         hallId: hall1.id,
         name: "Malika Rahimova",
         price: 1500000,
-        imageUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400",
+        image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400",
       },
     ],
     skipDuplicates: true,
@@ -223,18 +206,16 @@ async function main() {
   await prisma.car.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall1.id,
         brand: "Mercedes-Benz S-Class",
         price: 500000,
-        imageUrl: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400",
+        image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400",
       },
       {
-        id: randomUUID(),
         hallId: hall1.id,
         brand: "BMW 7 Series",
         price: 450000,
-        imageUrl: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400",
       },
     ],
     skipDuplicates: true,
@@ -242,9 +223,16 @@ async function main() {
 
   await prisma.menuItem.createMany({
     data: [
-      { id: randomUUID(), hallId: hall1.id, name: "Osh (Palov)", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400" },
-      { id: randomUUID(), hallId: hall1.id, name: "Manti", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400" },
-      { id: randomUUID(), hallId: hall1.id, name: "Shashlik", imageUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400" },
+      { hallId: hall1.id, name: "Osh (Palov)", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400" },
+      { hallId: hall1.id, name: "Manti", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400" },
+      { hallId: hall1.id, name: "Shashlik", image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400" },
+    ],
+    skipDuplicates: true,
+  });
+
+  await prisma.additionalService.createMany({
+    data: [
+      { hallId: hall1.id, name: "Karnay-Surnay", price: 800000, type: "KARNAY" },
     ],
     skipDuplicates: true,
   });
@@ -255,12 +243,10 @@ async function main() {
     create: {
       id: "hall-seed-6",
       name: "Navro'z Saroyi",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1561912774-79769a0a0a7a?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1561912774-79769a0a0a7a?w=800",
+        "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800",
+      ],
       district: "Shayxontohur",
       address: "Shayxontohur tumani, Navoiy ko'chasi, 12-uy",
       capacity: 450,
@@ -277,12 +263,10 @@ async function main() {
     create: {
       id: "hall-seed-7",
       name: "Milliy To'yxona",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800",
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
+      ],
       district: "Olmazar",
       address: "Olmazar tumani, Farobiy ko'chasi, 7-uy",
       capacity: 350,
@@ -299,12 +283,10 @@ async function main() {
     create: {
       id: "hall-seed-8",
       name: "Durdonа Banquet",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=800",
+        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800",
+      ],
       district: "Mirobod",
       address: "Mirobod tumani, Mustaqillik ko'chasi, 33-uy",
       capacity: 550,
@@ -321,12 +303,10 @@ async function main() {
     create: {
       id: "hall-seed-9",
       name: "Yashnobod Grand",
-      hallImages: {
-        create: [
-          { url: "https://images.unsplash.com/photo-1522413452208-996ff3f3e740?w=800", sortOrder: 0 },
-          { url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800", sortOrder: 1 },
-        ],
-      },
+      images: [
+        "https://images.unsplash.com/photo-1522413452208-996ff3f3e740?w=800",
+        "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800",
+      ],
       district: "Yashnobod",
       address: "Yashnobod tumani, Ipak yo'li ko'chasi, 55-uy",
       capacity: 280,
@@ -341,11 +321,10 @@ async function main() {
   await prisma.singer.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall6.id,
         name: "Ulmas Rahimov",
         price: 1800000,
-        imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
       },
     ],
     skipDuplicates: true,
@@ -354,34 +333,36 @@ async function main() {
   await prisma.car.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall6.id,
         brand: "Rolls-Royce Ghost",
         price: 800000,
-        imageUrl: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400",
+        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400",
       },
     ],
     skipDuplicates: true,
   });
 
-  // Remove deprecated additionalService seed data; karnay service is handled by hall.karnayEnabled and booking services.
+  await prisma.additionalService.createMany({
+    data: [
+      { hallId: hall6.id, name: "Karnay-Surnay", price: 900000, type: "KARNAY" },
+    ],
+    skipDuplicates: true,
+  });
 
   // Additional services for hall8
   await prisma.singer.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall8.id,
         name: "Zulfiya Husanova",
         price: 2500000,
-        imageUrl: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400",
+        image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=400",
       },
       {
-        id: randomUUID(),
         hallId: hall8.id,
         name: "Sardor Mamadaliyev",
         price: 3000000,
-        imageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
+        image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400",
       },
     ],
     skipDuplicates: true,
@@ -390,18 +371,16 @@ async function main() {
   await prisma.car.createMany({
     data: [
       {
-        id: randomUUID(),
         hallId: hall8.id,
         brand: "Mercedes-Benz G-Class",
         price: 700000,
-        imageUrl: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400",
+        image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400",
       },
       {
-        id: randomUUID(),
         hallId: hall8.id,
         brand: "Porsche Cayenne",
         price: 600000,
-        imageUrl: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400",
       },
     ],
     skipDuplicates: true,
@@ -409,14 +388,19 @@ async function main() {
 
   await prisma.menuItem.createMany({
     data: [
-      { id: randomUUID(), hallId: hall8.id, name: "Osh (Palov)", imageUrl: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400" },
-      { id: randomUUID(), hallId: hall8.id, name: "Kabob", imageUrl: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400" },
-      { id: randomUUID(), hallId: hall8.id, name: "Lagmon", imageUrl: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400" },
+      { hallId: hall8.id, name: "Osh (Palov)", image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400" },
+      { hallId: hall8.id, name: "Kabob", image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400" },
+      { hallId: hall8.id, name: "Lagmon", image: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400" },
     ],
     skipDuplicates: true,
   });
 
-  // Removed deprecated additionalService seed data for hall8.
+  await prisma.additionalService.createMany({
+    data: [
+      { hallId: hall8.id, name: "Karnay-Surnay", price: 1000000, type: "KARNAY" },
+    ],
+    skipDuplicates: true,
+  });
 
   // Bookings
   const bookingDates = [
@@ -433,20 +417,20 @@ async function main() {
   ];
 
   const bookingData = [
-    { id: randomUUID(), hallId: hall1.id, userId: user1.id, bookingDate: bookingDates[0], guestCount: 200, totalPrice: 30000000, advancePayment: 6000000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall1.id, userId: user1.id, bookingDate: bookingDates[1], guestCount: 300, totalPrice: 45000000, advancePayment: 9000000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall2.id, userId: user1.id, bookingDate: bookingDates[2], guestCount: 150, totalPrice: 18000000, advancePayment: 3600000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall2.id, userId: user1.id, bookingDate: bookingDates[3], guestCount: 200, totalPrice: 24000000, advancePayment: 4800000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall3.id, userId: user1.id, bookingDate: bookingDates[4], guestCount: 250, totalPrice: 45000000, advancePayment: 9000000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall4.id, userId: user1.id, bookingDate: bookingDates[5], guestCount: 400, totalPrice: 80000000, advancePayment: 16000000, status: "UPCOMING" as const },
-    { id: randomUUID(), hallId: hall1.id, userId: user1.id, bookingDate: bookingDates[6], guestCount: 180, totalPrice: 27000000, advancePayment: 5400000, status: "COMPLETED" as const },
-    { id: randomUUID(), hallId: hall2.id, userId: user1.id, bookingDate: bookingDates[7], guestCount: 120, totalPrice: 14400000, advancePayment: 2880000, status: "COMPLETED" as const },
-    { id: randomUUID(), hallId: hall3.id, userId: user1.id, bookingDate: bookingDates[8], guestCount: 100, totalPrice: 18000000, advancePayment: 3600000, status: "CANCELLED" as const },
-    { id: randomUUID(), hallId: hall4.id, userId: user1.id, bookingDate: bookingDates[9], guestCount: 300, totalPrice: 60000000, advancePayment: 12000000, status: "UPCOMING" as const },
+    { hallId: hall1.id, userId: user1.id, date: bookingDates[0], guestCount: 200, totalPrice: 30000000, advancePayment: 6000000, status: "UPCOMING" as const },
+    { hallId: hall1.id, userId: user1.id, date: bookingDates[1], guestCount: 300, totalPrice: 45000000, advancePayment: 9000000, status: "UPCOMING" as const },
+    { hallId: hall2.id, userId: user1.id, date: bookingDates[2], guestCount: 150, totalPrice: 18000000, advancePayment: 3600000, status: "UPCOMING" as const },
+    { hallId: hall2.id, userId: user1.id, date: bookingDates[3], guestCount: 200, totalPrice: 24000000, advancePayment: 4800000, status: "UPCOMING" as const },
+    { hallId: hall3.id, userId: user1.id, date: bookingDates[4], guestCount: 250, totalPrice: 45000000, advancePayment: 9000000, status: "UPCOMING" as const },
+    { hallId: hall4.id, userId: user1.id, date: bookingDates[5], guestCount: 400, totalPrice: 80000000, advancePayment: 16000000, status: "UPCOMING" as const },
+    { hallId: hall1.id, userId: user1.id, date: bookingDates[6], guestCount: 180, totalPrice: 27000000, advancePayment: 5400000, status: "COMPLETED" as const },
+    { hallId: hall2.id, userId: user1.id, date: bookingDates[7], guestCount: 120, totalPrice: 14400000, advancePayment: 2880000, status: "COMPLETED" as const },
+    { hallId: hall3.id, userId: user1.id, date: bookingDates[8], guestCount: 100, totalPrice: 18000000, advancePayment: 3600000, status: "CANCELLED" as const },
+    { hallId: hall4.id, userId: user1.id, date: bookingDates[9], guestCount: 300, totalPrice: 60000000, advancePayment: 12000000, status: "UPCOMING" as const },
   ];
 
   for (const booking of bookingData) {
-    await prisma.booking.create({ data: booking });
+    await prisma.booking.create({ data: { ...booking, selectedServices: [] } });
   }
 
   console.log("✅ Seed completed!");

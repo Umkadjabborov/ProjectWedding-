@@ -1,175 +1,204 @@
+// =============================================================
+// FAYL: prisma/schema.prisma
+// MAQSAD: Ma'lumotlar bazasi sxemasi — barcha jadvallar va
+//         ularning o'zaro bog'liqliklari shu yerda aniqlanadi.
+//         Prisma ORM bu faylni o'qib, PostgreSQL jadvallarini
+//         avtomatik yaratadi va TypeScript turlarini generatsiya qiladi.
+// =============================================================
+
+// Prisma Client generatori — TypeScript uchun type-safe DB client yaratadi
 generator client {
   provider = "prisma-client-js"
 }
 
+// PostgreSQL ulanish sozlamalari — .env faylidan DATABASE_URL o'qiladi
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DATABASE_URL")
 }
 
-model BookingService {
-  id           Int          @id @default(autoincrement())
-  bookingId    String       @db.VarChar(50) @map("booking_id")
-  serviceType  ServiceType  @map("service_type")
-  serviceName  String       @db.VarChar(255) @map("service_name")
-  price        BigInt
-  booking      Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@map("booking_services")
+// ---------------------------------------------------------------
+// ENUM: Foydalanuvchi rollari
+// ADMIN  — barcha huquqlar
+// OWNER  — faqat o'z zalini boshqaradi
+// USER   — faqat bron qiladi
+// ---------------------------------------------------------------
+enum Role {
+  ADMIN
+  OWNER
+  USER
 }
 
-model Booking {
-  id              String           @id @db.VarChar(50)
-  hallId          String           @db.VarChar(50) @map("hall_id")
-  userId          String           @db.VarChar(50) @map("user_id")
-  bookingDate     DateTime         @db.Date @map("booking_date")
-  guestCount      Int              @map("guest_count")
-  totalPrice      BigInt           @map("total_price")
-  advancePayment  BigInt           @map("advance_payment")
-  status          BookingStatus    @default(UPCOMING)
-  notes           String?
-  createdAt       DateTime         @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt       DateTime         @default(now()) @db.Timestamptz(6) @map("updated_at")
-  bookingServices BookingService[]
-  hall            Hall             @relation(fields: [hallId], references: [id], onUpdate: NoAction)
-  user            User             @relation(fields: [userId], references: [id], onUpdate: NoAction)
-
-  @@unique([hallId, bookingDate])
-  @@index([bookingDate], map: "idx_bookings_date")
-  @@index([hallId], map: "idx_bookings_hall")
-  @@index([status], map: "idx_bookings_status")
-  @@index([userId], map: "idx_bookings_user")
-  @@map("bookings")
+// ---------------------------------------------------------------
+// ENUM: Zal holati
+// PENDING  — admin tasdiqlashini kutmoqda
+// APPROVED — tasdiqlangan, foydalanuvchilarga ko'rinadi
+// ---------------------------------------------------------------
+enum HallStatus {
+  PENDING
+  APPROVED
 }
 
-model Car {
-  id         String   @id @db.VarChar(50)
-  hallId     String   @db.VarChar(50) @map("hall_id")
-  brand      String   @db.VarChar(255)
-  price      BigInt
-  imageUrl   String?  @db.VarChar(255) @map("image_url")
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  hall       Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([hallId], map: "idx_cars_hall")
-  @@map("cars")
-}
-
-model HallImage {
-  id         Int      @id @default(autoincrement())
-  hallId     String   @db.VarChar(50) @map("hall_id")
-  url        String
-  sortOrder  Int      @default(0) @map("sort_order")
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  hall       Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([hallId], map: "idx_hall_images_hall")
-  @@map("hall_images")
-}
-
-model Hall {
-  id             String      @id @db.VarChar(50)
-  name           String      @db.VarChar(255)
-  district       String      @db.VarChar(100)
-  address        String
-  capacity       Int
-  pricePerSeat   BigInt      @map("price_per_seat")
-  phone          String      @db.VarChar(20)
-  status         HallStatus  @default(PENDING)
-  ownerId        String?     @db.VarChar(50) @map("owner_id")
-  karnayEnabled  Boolean     @default(false) @map("karnay_available")
-  karnayPrice    BigInt?     @map("karnay_price")
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt      DateTime    @default(now()) @db.Timestamptz(6) @map("updated_at")
-  bookings       Booking[]
-  cars           Car[]
-  hallImages     HallImage[]
-  owner          User?       @relation(fields: [ownerId], references: [id], onUpdate: NoAction)
-  menuItems      MenuItem[]
-  singers        Singer[]
-
-  @@index([district], map: "idx_halls_district")
-  @@index([ownerId], map: "idx_halls_owner")
-  @@index([status], map: "idx_halls_status")
-  @@map("halls")
-}
-
-model MenuItem {
-  id         String   @id @db.VarChar(50)
-  hallId     String   @db.VarChar(50) @map("hall_id")
-  name       String   @db.VarChar(255)
-  imageUrl   String?  @db.VarChar(255) @map("image_url")
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  hall       Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([hallId], map: "idx_menu_hall")
-  @@map("menu_items")
-}
-
-model OtpCode {
-  id         Int      @id @default(autoincrement())
-  userId     String   @db.VarChar(50) @map("user_id")
-  code       String   @db.Char(6)
-  expiresAt  DateTime @db.Timestamptz(6) @map("expires_at")
-  used       Boolean  @default(false)
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([userId], map: "idx_otp_user")
-  @@map("otp_codes")
-}
-
-model Singer {
-  id         String   @id @db.VarChar(50)
-  hallId     String   @db.VarChar(50) @map("hall_id")
-  name       String   @db.VarChar(255)
-  price      BigInt
-  imageUrl   String?  @db.VarChar(255) @map("image_url")
-  createdAt  DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
-  hall       Hall     @relation(fields: [hallId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([hallId], map: "idx_singers_hall")
-  @@map("singers")
-}
-
-model User {
-  id          String      @id @db.VarChar(50)
-  firstName   String      @db.VarChar(100) @map("first_name")
-  lastName    String      @db.VarChar(100) @map("last_name")
-  email       String      @unique @db.VarChar(255)
-  username    String      @unique @db.VarChar(100)
-  password    String      @db.VarChar(255)
-  phone       String      @db.VarChar(20)
-  role        UserRole    @default(USER)
-  isVerified  Boolean     @default(false) @map("is_verified")
-  createdAt   DateTime    @default(now()) @db.Timestamptz(6) @map("created_at")
-  bookings    Booking[]
-  halls       Hall[]
-  otpCodes    OtpCode[]
-
-  @@map("users")
-}
-
+// ---------------------------------------------------------------
+// ENUM: Bron holati
+// UPCOMING  — kelajakdagi bron
+// COMPLETED — o'tib ketgan bron
+// CANCELLED — bekor qilingan bron
+// ---------------------------------------------------------------
 enum BookingStatus {
   UPCOMING
   COMPLETED
   CANCELLED
 }
 
-enum HallStatus {
-  PENDING
-  APPROVED
-}
-
+// ---------------------------------------------------------------
+// ENUM: Qo'shimcha xizmat turlari
+// SINGER — xonanda
+// KARNAY — karnay-surnay
+// MENU   — taom
+// CAR    — mashina
+// ---------------------------------------------------------------
 enum ServiceType {
   SINGER
-  CAR
   KARNAY
+  MENU
+  CAR
 }
 
-enum UserRole {
-  ADMIN
-  OWNER
-  USER
+// ---------------------------------------------------------------
+// MODEL: User — foydalanuvchilar jadvali
+// Barcha rollar (ADMIN, OWNER, USER) shu jadvalda saqlanadi
+// ---------------------------------------------------------------
+model User {
+  id         String   @id @default(cuid())   // Unikal ID (cuid format)
+  firstName  String                           // Ism
+  lastName   String                           // Familiya
+  email      String   @unique                 // Email (unikal)
+  username   String   @unique                 // Username (unikal)
+  password   String                           // Bcrypt bilan hash qilingan parol
+  phone      String?                          // Telefon (ixtiyoriy)
+  role       Role     @default(USER)          // Rol (default: USER)
+  isVerified Boolean  @default(false)         // Email tasdiqlangan yoki yo'q
+  createdAt  DateTime @default(now())         // Yaratilgan vaqt
+  updatedAt  DateTime @updatedAt              // Yangilangan vaqt
+
+  halls    Hall[]    // Bu foydalanuvchiga tegishli zallar (OWNER uchun)
+  bookings Booking[] // Bu foydalanuvchi qilgan bronlar
+  otps     OTP[]     // Bu foydalanuvchiga yuborilgan OTP kodlar
+}
+
+// ---------------------------------------------------------------
+// MODEL: OTP — email tasdiqlash kodlari jadvali
+// Ega birinchi marta kirganda 6 xonali kod yuboriladi
+// ---------------------------------------------------------------
+model OTP {
+  id        String   @id @default(cuid())
+  userId    String                          // Qaysi foydalanuvchiga tegishli
+  code      String                          // 6 xonali raqamli kod
+  expiresAt DateTime                        // Muddati tugash vaqti (5 daqiqa)
+  used      Boolean  @default(false)        // Ishlatilgan yoki yo'q
+  createdAt DateTime @default(now())
+
+  // User o'chirilsa, uning OTP lari ham o'chadi
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// MODEL: Hall — to'yxonalar jadvali
+// ---------------------------------------------------------------
+model Hall {
+  id           String     @id @default(cuid())
+  name         String                           // Zal nomi
+  images       String[]                         // Rasm URL lari massivi
+  district     String                           // Toshkent tumani
+  address      String                           // To'liq manzil
+  latitude     Float?                           // GPS koordinatalar (optional)
+  longitude    Float?                           // GPS koordinatalar (optional)
+  capacity     Int                              // Necha kishi sig'adi
+  pricePerSeat Float                            // Bir kishi uchun narx (so'm)
+  phone        String                           // Zal telefon raqami
+  status       HallStatus @default(PENDING)     // Holat (default: PENDING)
+  ownerId      String                           // Egasi (User.id)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  owner     User                @relation(fields: [ownerId], references: [id])
+  bookings  Booking[]           // Bu zalga qilingan bronlar
+  services  AdditionalService[] // Karnay-surnay kabi xizmatlar
+  singers   Singer[]            // Xonandalar
+  cars      Car[]               // Mashinalar
+  menuItems MenuItem[]          // Menyu elementlari
+}
+
+// ---------------------------------------------------------------
+// MODEL: AdditionalService — qo'shimcha xizmatlar (asosan Karnay)
+// ---------------------------------------------------------------
+model AdditionalService {
+  id     String      @id @default(cuid())
+  hallId String
+  name   String   // Xizmat nomi
+  price  Float    // Narxi
+  type   ServiceType // Turi (KARNAY, SINGER, va h.k.)
+
+  // Zal o'chirilsa, xizmatlar ham o'chadi
+  hall Hall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// MODEL: Singer — xonandalar jadvali
+// ---------------------------------------------------------------
+model Singer {
+  id     String @id @default(cuid())
+  hallId String
+  name   String  // Xonanda ismi
+  price  Float   // Narxi
+  image  String  // Rasm URL
+
+  hall Hall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// MODEL: Car — to'y mashinalar jadvali
+// ---------------------------------------------------------------
+model Car {
+  id     String @id @default(cuid())
+  hallId String
+  brand  String  // Mashina markasi (Mercedes, BMW...)
+  price  Float   // Narxi
+  image  String  // Rasm URL
+
+  hall Hall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// MODEL: MenuItem — menyu elementlari jadvali
+// ---------------------------------------------------------------
+model MenuItem {
+  id     String @id @default(cuid())
+  hallId String
+  name   String  // Taom nomi (Osh, Manti...)
+  image  String  // Rasm URL
+
+  hall Hall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------
+// MODEL: Booking — bronlar jadvali
+// ---------------------------------------------------------------
+model Booking {
+  id               String        @id @default(cuid())
+  hallId           String
+  userId           String
+  date             DateTime                          // Bron qilingan sana
+  guestCount       Int                               // Mehmonlar soni
+  totalPrice       Float                             // Jami narx
+  advancePayment   Float                             // Avans (jami narxning 20%)
+  status           BookingStatus @default(UPCOMING)  // Holat
+  selectedServices Json          @default("[]")      // Tanlangan xizmatlar (JSON)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  hall Hall @relation(fields: [hallId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }

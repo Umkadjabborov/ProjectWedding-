@@ -15,7 +15,7 @@ export default async function AdminHallDetailPage({ params }: { params: Promise<
       singers: true,
       cars: true,
       menuItems: true,
-      hallImages: true,
+      services: true,
       bookings: {
         where: { status: { not: "CANCELLED" } },
         include: { user: { select: { firstName: true, lastName: true, phone: true } } },
@@ -25,9 +25,8 @@ export default async function AdminHallDetailPage({ params }: { params: Promise<
 
   if (!hall) notFound();
 
-  const images = hall.hallImages.map((image) => image.url);
   const bookedDates = hall.bookings.map((b) => ({
-    date: b.bookingDate,
+    date: b.date,
     guestCount: b.guestCount,
     user: b.user,
   }));
@@ -41,7 +40,7 @@ export default async function AdminHallDetailPage({ params }: { params: Promise<
 
       {/* Images */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        {images.map((img, i) => (
+        {hall.images.map((img, i) => (
           <div key={i} className="relative aspect-video rounded-xl overflow-hidden">
             <Image src={img} alt={`${hall.name} ${i + 1}`} fill className="object-cover" />
           </div>
@@ -64,7 +63,7 @@ export default async function AdminHallDetailPage({ params }: { params: Promise<
         </div>
         <div className="flex items-center gap-2 text-sm">
           <Banknote className="h-4 w-4 text-primary" />
-          <span>{formatPrice(Number(hall.pricePerSeat))}/kishi</span>
+          <span>{formatPrice(hall.pricePerSeat)}/kishi</span>
         </div>
       </div>
 

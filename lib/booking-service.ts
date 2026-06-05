@@ -4,7 +4,7 @@ export async function completePastBookings(): Promise<void> {
   try {
     await prisma.booking.updateMany({
       where: {
-        bookingDate: { lt: new Date() },
+        date: { lt: new Date() },
         status: "UPCOMING",
       },
       data: { status: "COMPLETED" },

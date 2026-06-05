@@ -19,8 +19,11 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    // Development da xato va ogohlantirishlarni console ga chiqarish
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    // Development: enable verbose logs to help diagnose connection issues
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "info", "warn", "error"]
+        : ["error"],
   });
 
 // Development da global ga saqlaymiz (hot-reload uchun)

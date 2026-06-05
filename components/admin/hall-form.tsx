@@ -68,7 +68,7 @@ export function HallForm({ hall, isOwner }: HallFormProps) {
       cars: hall?.cars ?? [],
       menuItems: hall?.menuItems ?? [],
       karnayEnabled: !!karnayService,
-      karnayPrice: karnayService?.price ?? undefined,
+      karnayPrice: karnayService?.price,
       latitude: hall?.latitude ?? undefined,
       longitude: hall?.longitude ?? undefined,
     },

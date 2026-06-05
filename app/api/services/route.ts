@@ -6,17 +6,21 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const hallId = searchParams.get("hallId") || "";
+    const type = searchParams.get("type") || "";
 
-    const where = hallId ? { hallId } : {};
+    const where: Record<string, any> = {};
+    if (hallId) where.hallId = hallId;
+    if (type) where.type = type;
 
-    const singers = await prisma.singer.findMany({
+    const services = await prisma.additionalService.findMany({
       where,
       include: { hall: { select: { id: true, name: true } } },
       orderBy: { name: "asc" },
     });
-    return ok(singers);
+
+    return ok(services);
   } catch (e) {
-    console.error("[GET_SINGERS]", e);
+    console.error("[GET_SERVICES]", e);
     return serverError();
   }
 }
@@ -29,10 +33,10 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { hallId, name, price, image } = body;
+    const { hallId, name, price, type } = body;
 
-    if (!hallId || !name || !price) {
-      return err("Zal ID, xonanda nomi va narxi talab qilinadi", 400);
+    if (!hallId || !name || !price || !type) {
+      return err("Zal ID, xizmat nomi, narxi va turi talab qilinadi", 400);
     }
 
     // Check if hall exists
@@ -43,24 +47,24 @@ export async function POST(req: Request) {
 
     // Check if user is owner of the hall or admin
     if (session.user.role === "OWNER" && hall.ownerId !== session.user.id) {
-      return err("Sizga bu zal uchun xonanda qo'shish huquqi yo'q", 403);
+      return err("Sizga bu zal uchun xizmat qo'shish huquqi yo'q", 403);
     }
 
-    const singer = await prisma.singer.create({
+    const service = await prisma.additionalService.create({
       data: {
         hallId,
         name,
         price: parseFloat(price),
-        image: image || "",
+        type,
       },
       include: {
         hall: { select: { id: true, name: true } },
       },
     });
 
-    return ok(singer, 201);
+    return ok(service, 201);
   } catch (e) {
-    console.error("[CREATE_SINGER]", e);
+    console.error("[CREATE_SERVICE]", e);
     return serverError();
   }
 }
