@@ -14,8 +14,10 @@ export async function GET(req: Request) {
     const sortOrder = (searchParams.get("sortOrder") || "desc") as "asc" | "desc";
 
     const session = await auth();
-    const isAdmin = session?.user.role === "ADMIN";
-    const isOwner = session?.user.role === "OWNER";
+    // session?.user?.role orqali xavfsiz tekshiramiz, session bo'lmasa undefined qaytadi
+    const isAdmin = session?.user?.role === "ADMIN";
+    const isOwner = session?.user?.role === "OWNER";
+    const userId = session?.user?.id;
 
     const where: Record<string, unknown> = {};
 
@@ -24,16 +26,19 @@ export async function GET(req: Request) {
 
     if (isAdmin) {
       if (status) where.status = status;
-    } else if (isOwner) {
-      where.ownerId = session!.user.id;
+    } else if (isOwner && userId) {
+      // Ega faqat o'z zallarini ko'radi
+      where.ownerId = userId;
     } else {
+      // Mehmonlar va oddiy foydalanuvchilar faqat tasdiqlanganlarni ko'radi
       where.status = "APPROVED";
     }
 
     const halls = await prisma.hall.findMany({
       where,
       include: {
-        owner: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+        // Telefon raqami faqat Admin yoki Ega (o'z zali bo'lsa) ko'rishi mumkin
+        owner: { select: { id: true, firstName: true, lastName: true, phone: isAdmin } },
         _count: { select: { bookings: true } },
       },
       orderBy: { [sortBy]: sortOrder },
@@ -43,13 +48,6 @@ export async function GET(req: Request) {
   } catch (e) {
     const errAny = e as any;
     console.error("[GET_HALLS]", errAny, errAny?.stack || "no-stack");
-    try {
-      // attempt to log Prisma client info for debugging
-      // @ts-ignore
-      console.error("PrismaClient active connections:", prisma._client?.pool?._debug || prisma._client);
-    } catch (err) {
-      console.error("Failed to read prisma internals", err);
-    }
     return serverError();
   }
 }
